@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cyber Café Access</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <h2>Cyber Café Login Request</h2>
+  <form onsubmit="grantAccess(); return false;">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" required><br><br>
+
+    <label for="phone">Phone Number:</label><br>
+    <input type="tel" id="phone" required><br><br>
+
+    <button type="submit">Request Access</button>
+  </form>
+
+  <p id="status"></p>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5YUhpgFScfmaPw9EEiXwwNl3j-n0Fz5Q",
+      authDomain: "cyber-auth-e504c.firebaseapp.com",
+      projectId: "cyber-auth-e504c",
+      storageBucket: "cyber-auth-e504c.firebasestorage.app",
+      messagingSenderId: "125074118764",
+      appId: "1:125074118764:web:a5656962cbf3990f56e049",
+      measurementId: "G-WNCQE8J1BL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Grant access request
+    async function grantAccess() {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const status = document.getElementById("status");
+
+      if (!name || phone.length < 10) {
+        status.textContent = "Please enter a valid name and phone number.";
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "requests"), {
+          name: name,
+          phone: phone,
+          approved: false,
+          timestamp: serverTimestamp()
+        });
+
+        status.textContent = "Request sent. Please wait for owner approval.";
+      } catch (error) {
+        console.error("Error sending request:", error);
+        status.textContent = "Something went wrong. Try again.";
+      }
+    }
+  </script>
+</body>
+</html>
